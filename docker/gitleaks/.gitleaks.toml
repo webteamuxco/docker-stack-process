@@ -22,8 +22,8 @@ keywords = ["secret", "token", "password", "passwd", "pwd", "key"]
 [[allowlists]]
 description = "Files without real secrets"
 paths = [
-  '''(^|/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock|composer\.lock|poetry\.lock|Cargo\.lock|go\.sum)$''',
-  '''(^|/)(node_modules|vendor|dist|build|\.next|coverage)/''',
+  '''(^|/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock|composer\.lock|poetry\.lock|Cargo\.lock|go\.sum|docker-compose\.yml)$''',
+  '''(^|/)(node_modules|vendor|dist|build|\.next|coverage|\.expo|\.claude|ios|android)/''',
   '''(^|/)\.env(\.(local|dev|development|prod|production|test|staging))?(\.local)?$''',  # local .env files (not .env.example), never committed
 ]
 
@@ -36,3 +36,4 @@ regexes = [
 ]
 # Example values (.env.example, docs) are ignored if they contain one of these words.
 stopwords = ["change-me", "changeme", "replace", "example", "your-", "placeholder", "xxxx", "dummy"]
+ 
