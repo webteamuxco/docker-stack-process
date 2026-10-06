@@ -1,0 +1,20 @@
+# GIT-CLIFF DOCKER COMPOSE
+name: cliff
+
+services:
+
+  # CHANGELOG.md GENERATION (Conventional Commits)
+  cliff:
+    image: orhunp/git-cliff:2.13.1
+    profiles:
+      - security
+    # Same uid as the repository owner: libgit2 rejects a "dubious ownership" repository,
+    # and the generated CHANGELOG.md stays editable on the host.
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ${STACK_PROJECT_ROOT:-../..}:/repo
+      - ..:/stack:ro
+    working_dir: /repo
+    command:
+      - --config=/stack/cliff/cliff.toml
+      - --output=CHANGELOG.md

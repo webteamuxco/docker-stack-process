@@ -1,0 +1,21 @@
+services:
+  trivy:
+    image: aquasec/trivy:0.75.0
+    profiles:
+      - security
+    working_dir: /src
+    volumes:
+      - ${STACK_PROJECT_ROOT:-../..}:/src:ro
+      - trivy_cache:/root/.cache/trivy
+    command:
+      - fs
+      - --scanners
+      - vuln,misconfig
+      - --severity
+      - HIGH,CRITICAL
+      - --exit-code
+      - "1"
+      - /src
+
+volumes:
+  trivy_cache:

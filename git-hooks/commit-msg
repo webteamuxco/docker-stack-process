@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+# Project to analyze: the repository running the hook (also when the stack is a submodule).
+STACK_PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+export STACK_PROJECT_ROOT
+
+docker compose --profile security run --rm -T --quiet-pull commitlint \
+  --config=/commitlint.config.js \
+  --edit "$1"

@@ -1,0 +1,18 @@
+name: commitlint
+
+services:
+  commitlint:
+    image: commitlint/commitlint:21.2.3
+    profiles:
+      - security
+    environment:
+      GIT_CONFIG_COUNT: 1
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: /repo
+    volumes:
+      - ${STACK_PROJECT_ROOT:-../..}:/repo:ro
+      - ./commitlint.config.js:/commitlint.config.js:ro
+    working_dir: /repo
+    command:
+      - --config=/commitlint.config.js
+      - --last

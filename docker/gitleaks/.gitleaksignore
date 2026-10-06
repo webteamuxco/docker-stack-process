@@ -1,0 +1,18 @@
+# Gitleaks exceptions
+#
+# Format:
+# commit:file:rule:line
+#
+# The fingerprint is printed by gitleaks for each finding.
+#
+# Add an entry only when the finding is a confirmed false positive.
+# Every exception must be documented with the reason above it, for example:
+#
+# ---------------------------------------------------------------------------
+# path/to/file.yml
+# ---------------------------------------------------------------------------
+#
+# The value was an example placeholder, not a real secret.
+# It was replaced in the following commit, but remains in the Git history.
+#
+# <commit-sha>:path/to/file.yml:<rule-id>:<line>

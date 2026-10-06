@@ -1,0 +1,38 @@
+# Gitleaks configuration.
+# Default gitleaks rules + a generic rule for secrets assigned in configuration files.
+# Add project-specific rules below the generic one.
+# Docs: https://github.com/gitleaks/gitleaks#configuration
+
+title = "docker-stack-process"
+
+[extend]
+useDefault = true
+
+# --- Secret-like variable assigned a literal value in a configuration file
+#   API_KEY=abcd1234...      DB_PASSWORD: "s3cr3t..."      CLIENT_SECRET = ...
+[[rules]]
+id = "env-secret-assignment"
+description = "Secret-like variable (*_SECRET, *_TOKEN, *_PASSWORD, *_API_KEY, *_PRIVATE_KEY) assigned a literal value"
+# Limited to configuration files: in source code, these names are usually keys, not values.
+path = '''(^|/)([^/]*\.env(\.[^/]*)?|\.env[^/]*|[^/]+\.(ya?ml|toml|ini|conf|properties|sh)|Dockerfile[^/]*)$'''
+regex = '''(?i)\b[A-Z0-9_]*(?:SECRET|TOKEN|PASSWORD|PASSWD|PWD|API_?KEY|PRIVATE_?KEY|ACCESS_?KEY)[A-Z0-9_]*[ \t]*[=:][ \t]*["']?([^"'\s#$<{][^"'\s#]{7,})'''
+secretGroup = 1
+keywords = ["secret", "token", "password", "passwd", "pwd", "key"]
+
+[[allowlists]]
+description = "Files without real secrets"
+paths = [
+  '''(^|/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock|composer\.lock|poetry\.lock|Cargo\.lock|go\.sum)$''',
+  '''(^|/)(node_modules|vendor|dist|build|\.next|coverage)/''',
+  '''(^|/)\.env(\.(local|dev|development|prod|production|test|staging))?(\.local)?$''',  # local .env files (not .env.example), never committed
+]
+
+[[allowlists]]
+description = "Placeholders and example values"
+regexes = [
+  '''\{\{[\w.-]+\}\}''',                   # template variable: {{token}}
+  '''\$\{[\w.:-]*\}''',                    # variable reference: ${TOKEN}
+  '''(\.\.\.|…)$''',                       # truncated example value: sk-...
+]
+# Example values (.env.example, docs) are ignored if they contain one of these words.
+stopwords = ["change-me", "changeme", "replace", "example", "your-", "placeholder", "xxxx", "dummy"]
