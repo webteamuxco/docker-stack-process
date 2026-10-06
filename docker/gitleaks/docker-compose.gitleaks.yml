@@ -1,37 +1,40 @@
 # GITLEAKS DOCKER COMPOSE
 name: gitleaks
 
+# Config and ignore files: the project's own (/repo/.gitleaks.toml, /repo/.gitleaksignore)
+# take precedence over the stack defaults (/stack/gitleaks/...).
+x-gitleaks: &gitleaks
+  image: ghcr.io/gitleaks/gitleaks:v8.30.1
+  profiles:
+    - security
+  volumes:
+    - ${STACK_PROJECT_ROOT:-../..}:/repo:ro
+    - ..:/stack:ro
+  working_dir: /repo
+  entrypoint:
+    - sh
+    - -c
+    - |
+      config=/stack/gitleaks/.gitleaks.toml
+      ignore=/stack/gitleaks/.gitleaksignore
+      [ -f /repo/.gitleaks.toml ] && config=/repo/.gitleaks.toml
+      [ -f /repo/.gitleaksignore ] && ignore=/repo/.gitleaksignore
+      echo "gitleaks config: $$config"
+      echo "gitleaks ignore: $$ignore"
+      exec gitleaks detect --source=/repo --config="$$config" --gitleaks-ignore-path="$$ignore" "$$@"
+    - gitleaks
+
 services:
 
   # SCAN WITHOUT GIT HISTORY
   gitleaks:
-    image: ghcr.io/gitleaks/gitleaks:v8.30.1
-    profiles:
-      - security
-    volumes:
-      - ${STACK_PROJECT_ROOT:-../..}:/repo:ro
-      - ..:/stack:ro
-    working_dir: /repo
+    <<: *gitleaks
     command:
-      - detect
-      - --source=/repo
-      - --config=/stack/gitleaks/.gitleaks.toml
-      - --gitleaks-ignore-path=/stack/gitleaks/.gitleaksignore
       - --no-git
       - --verbose
 
   # SCAN WITH GIT HISTORY
   gitleaks-history:
-    image: ghcr.io/gitleaks/gitleaks:v8.30.1
-    profiles:
-      - security
-    volumes:
-      - ${STACK_PROJECT_ROOT:-../..}:/repo:ro
-      - ..:/stack:ro
-    working_dir: /repo
+    <<: *gitleaks
     command:
-      - detect
-      - --source=/repo
-      - --config=/stack/gitleaks/.gitleaks.toml
-      - --gitleaks-ignore-path=/stack/gitleaks/.gitleaksignore
       - --verbose

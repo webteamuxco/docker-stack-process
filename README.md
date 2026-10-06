@@ -314,9 +314,7 @@ docker compose --profile security run --rm -T gitleaks
 ```sh
 #!/usr/bin/env sh
 
-docker compose --profile security run --rm -T --quiet-pull commitlint \
-  --config=/commitlint.config.js \
-  --edit "$1"
+docker compose --profile security run --rm -T --quiet-pull commitlint --edit "$1"
 ```
 
 ## Available Tools

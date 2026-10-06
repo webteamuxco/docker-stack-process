@@ -125,7 +125,6 @@ Check a specific commit message:
 
 ```bash
 docker compose --profile security run --rm commitlint \
-  --config=/commitlint.config.js \
   --edit /repo/.git/COMMIT_EDITMSG
 ```
 

@@ -1,6 +1,8 @@
 name: commitlint
 
 services:
+  # Config: the project's own commitlint.config.{js,cjs,mjs} (at /repo) takes precedence
+  # over the stack default (/commitlint.config.js).
   commitlint:
     image: commitlint/commitlint:21.2.3
     profiles:
@@ -13,6 +15,16 @@ services:
       - ${STACK_PROJECT_ROOT:-../..}:/repo:ro
       - ./commitlint.config.js:/commitlint.config.js:ro
     working_dir: /repo
+    entrypoint:
+      - sh
+      - -c
+      - |
+        config=/commitlint.config.js
+        for f in /repo/commitlint.config.js /repo/commitlint.config.cjs /repo/commitlint.config.mjs; do
+          if [ -f "$$f" ]; then config="$$f"; break; fi
+        done
+        echo "commitlint config: $$config" >&2
+        exec commitlint --config="$$config" "$$@"
+      - commitlint
     command:
-      - --config=/commitlint.config.js
       - --last

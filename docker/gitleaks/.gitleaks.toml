@@ -15,7 +15,8 @@ id = "env-secret-assignment"
 description = "Secret-like variable (*_SECRET, *_TOKEN, *_PASSWORD, *_API_KEY, *_PRIVATE_KEY) assigned a literal value"
 # Limited to configuration files: in source code, these names are usually keys, not values.
 path = '''(^|/)([^/]*\.env(\.[^/]*)?|\.env[^/]*|[^/]+\.(ya?ml|toml|ini|conf|properties|sh)|Dockerfile[^/]*)$'''
-regex = '''(?i)\b[A-Z0-9_]*(?:SECRET|TOKEN|PASSWORD|PASSWD|PWD|API_?KEY|PRIVATE_?KEY|ACCESS_?KEY)[A-Z0-9_]*[ \t]*[=:][ \t]*["']?([^"'\s#$<{][^"'\s#]{7,})'''
+# The name must END with the keyword: ECCO_TOKEN_GRANT_TYPE or ssh_private_key_file are not secrets.
+regex = '''(?i)\b[A-Z0-9_]*(?:SECRET|TOKEN|PASSWORD|PASSWD|PWD|API_?KEY|PRIVATE_?KEY|ACCESS_?KEY)[ \t]*[=:][ \t]*["']?([^"'\s#$<{][^"'\s#]{7,})'''
 secretGroup = 1
 keywords = ["secret", "token", "password", "passwd", "pwd", "key"]
 
@@ -32,6 +33,7 @@ description = "Placeholders and example values"
 regexes = [
   '''\{\{[\w.-]+\}\}''',                   # template variable: {{token}}
   '''\$\{[\w.:-]*\}''',                    # variable reference: ${TOKEN}
+  '''\$[A-Za-z_]''',                       # shell / CI variable anywhere in the value: keys/$ENV-deploy (Bitbucket Pipelines, GitHub Actions)
   '''(\.\.\.|…)$''',                       # truncated example value: sk-...
 ]
 # Example values (.env.example, docs) are ignored if they contain one of these words.

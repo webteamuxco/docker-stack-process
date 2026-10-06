@@ -13,7 +13,9 @@ Checks that commit messages follow [Conventional Commits](https://www.convention
 | ------- | ----------- |
 | `commitlint` | Lints commit messages. By default, it checks the last commit (`--last`). |
 
-The analyzed project (`STACK_PROJECT_ROOT`, the repository root by default) is mounted read-only at `/repo`, and the configuration at `/commitlint.config.js`.
+The analyzed project (`STACK_PROJECT_ROOT`, the repository root by default) is mounted read-only at `/repo`, and the stack configuration at `/commitlint.config.js`.
+
+A `commitlint.config.js` (or `.cjs` / `.mjs`) at the root of the analyzed project takes precedence over the stack configuration. The file used is printed at startup (`commitlint config: ...`).
 
 ## Commit Format
 
@@ -59,7 +61,6 @@ Check a range of commits:
 
 ```bash
 docker compose --profile security run --rm commitlint \
-  --config=/commitlint.config.js \
   --from=origin/main \
   --to=HEAD
 ```
@@ -67,8 +68,7 @@ docker compose --profile security run --rm commitlint \
 Check a message without committing:
 
 ```bash
-echo "feat: my message" | docker compose --profile security run --rm -T commitlint \
-  --config=/commitlint.config.js
+echo "feat: my message" | docker compose --profile security run --rm -T commitlint --verbose
 ```
 
 ## Configuration

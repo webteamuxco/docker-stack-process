@@ -43,11 +43,26 @@ docker compose --profile security run --rm gitleaks; echo $?
 | [docker/gitleaks/.gitleaks.toml](../docker/gitleaks/.gitleaks.toml) | Rules and allowlists |
 | [docker/gitleaks/.gitleaksignore](../docker/gitleaks/.gitleaksignore) | Ignored findings (confirmed false positives) |
 
+### Project override
+
+A `.gitleaks.toml` or `.gitleaksignore` at the root of the analyzed project takes precedence over the stack default (each file independently). The file used is printed at startup (`gitleaks config: ...`).
+
+To keep the stack rules and only add project rules, extend the stack config from the project's `.gitleaks.toml`:
+
+```toml
+[extend]
+path = "/stack/gitleaks/.gitleaks.toml"
+
+[[rules]]
+id = "my-service-token"
+# ...
+```
+
 ### Rules
 
 `.gitleaks.toml` enables the [default gitleaks rules](https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml) (`useDefault = true`) and adds one generic rule:
 
-- `env-secret-assignment` — a variable named `*_SECRET`, `*_TOKEN`, `*_PASSWORD`, `*_API_KEY`, `*_PRIVATE_KEY`… assigned a literal value in a configuration file (`.env*`, YAML, TOML, INI, shell, Dockerfile).
+- `env-secret-assignment` — a variable named `*_SECRET`, `*_TOKEN`, `*_PASSWORD`, `*_API_KEY`, `*_PRIVATE_KEY`… assigned a literal value in a configuration file (`.env*`, YAML, TOML, INI, shell, Dockerfile). The name must end with the keyword (`ECCO_TOKEN_GRANT_TYPE` is not matched), and values containing a variable reference (`$ENV`, `${VAR}`, `${{ secrets.X }}`) are ignored, so CI files (Bitbucket Pipelines, GitHub Actions) do not trigger it.
 
 Project-specific rules can be added as new `[[rules]]` blocks:
 
