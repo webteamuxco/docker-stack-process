@@ -50,11 +50,26 @@ services:
         condition: service_healthy
     working_dir: /usr/src
     environment:
-      SONAR_HOST_URL: http://sonarqube:9000
+      SONAR_HOST_URL: ${SONAR_URL:-http://sonarqube:9000}
       SONAR_TOKEN: ${SONAR_TOKEN:-}
     volumes:
       - ${SONAR_PROJECT_DIR:-${STACK_PROJECT_ROOT:-../..}}:/usr/src
       - sonar_scanner_cache:/opt/sonar-scanner/.sonar/cache
+
+  sonar-profile-init:
+    image: curlimages/curl:latest
+    profiles: [security]
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+    environment:
+      SONAR_URL: ${SONAR_URL:-http://sonarqube:9000}
+      SONAR_USER: ${SONAR_USER:-admin}
+      SONAR_PASSWORD: ${SONAR_PASSWORD:-admin}
+    volumes:
+      - ./quality-profile.xml:/quality-profile.xml:ro
+      - ./init-quality-profile.sh:/init-quality-profile.sh:ro
+    entrypoint: ["/bin/sh", "/init-quality-profile.sh"]
 
 volumes:
   sonarqube_data:

@@ -36,7 +36,7 @@ stack_hook_body() {
         "if [ -f \"\$stack_hook\" ]; then" \
         "    sh \"\$stack_hook\" \"\$@\"" \
         "else" \
-        "    echo \"docker-stack-process: \$stack_hook not found, hook skipped (run: git submodule update --init).\" >&2" \
+        "    echo \"docker-stack-process: \$stack_hook not found, hook skipped (https://github.com/webteamuxco/docker-stack-process is missing to folder $STACK_PATH).\" >&2" \
         "fi"
 }
 
