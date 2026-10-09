@@ -6,9 +6,6 @@ SONAR_URL="${SONAR_URL:-http://localhost:9001}"
 SONAR_USER="${SONAR_USER:-admin}"
 SONAR_PASSWORD="${SONAR_PASSWORD:-admin}"
 
-echo $SONAR_USER
-echo $SONAR_PASSWORD
-
 PROFILE_FILE="$(dirname "$0")/quality-profile.xml"
 
 echo "Waiting for SonarQube..."
