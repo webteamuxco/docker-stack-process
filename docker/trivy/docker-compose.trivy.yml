@@ -20,21 +20,26 @@ services:
 
   trivy-report:
     image: aquasec/trivy:0.76.0
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     profiles:
       - security
     working_dir: /src
+    environment:
+      HOME: /tmp
     volumes:
       - ${STACK_PROJECT_ROOT:-../..}:/src:ro
       - ${STACK_PROJECT_ROOT:-../..}/reports/trivy:/reports
-      - trivy_cache:/root/.cache/trivy
+      - trivy_cache:/tmp/.cache/trivy
     entrypoint:
       - trivy
     command:
       - fs
-      - --scanners
-      - vuln,misconfig
+      - --cache-dir
+      - /tmp/.cache/trivy
       - --severity
       - HIGH,CRITICAL
+      - --scanners
+      - vuln,misconfig
       - --format
       - template
       - --template
