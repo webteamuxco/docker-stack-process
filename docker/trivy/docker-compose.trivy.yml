@@ -1,11 +1,12 @@
 services:
   trivy:
-    image: aquasec/trivy:0.75.0
+    image: aquasec/trivy:0.76.0
     profiles:
       - security
     working_dir: /src
     volumes:
       - ${STACK_PROJECT_ROOT:-../..}:/src:ro
+      - ${STACK_PROJECT_ROOT:-../..}/reports/trivy:/reports
       - trivy_cache:/root/.cache/trivy
     command:
       - fs
@@ -15,6 +16,31 @@ services:
       - HIGH,CRITICAL
       - --exit-code
       - "1"
+      - /src
+
+  trivy-report:
+    image: aquasec/trivy:0.76.0
+    profiles:
+      - security
+    working_dir: /src
+    volumes:
+      - ${STACK_PROJECT_ROOT:-../..}:/src:ro
+      - ${STACK_PROJECT_ROOT:-../..}/reports/trivy:/reports
+      - trivy_cache:/root/.cache/trivy
+    entrypoint:
+      - trivy
+    command:
+      - fs
+      - --scanners
+      - vuln,misconfig
+      - --severity
+      - HIGH,CRITICAL
+      - --format
+      - template
+      - --template
+      - "@/src/tools/docker-stack-process/docker/trivy/markdown.tpl"
+      - --output
+      - /reports/trivy-report.md
       - /src
 
 volumes:

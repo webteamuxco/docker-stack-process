@@ -7,15 +7,34 @@ STACK_PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 export STACK_PROJECT_ROOT
 
 # Uncomment the checks to run before each push.
+#!/bin/sh
 
-#echo "================================"
-#echo " Running Trivy security scan"
-#echo "================================"
+echo "================================"
+echo " Running Trivy security scan"
+echo "================================"
 
-#docker compose --profile security run --rm -T trivy
+docker compose --profile security run --rm -T trivy || exit 1
 
-#echo "================================"
-#echo " Running SonarQube analysis"
-#echo "================================"
+echo "================================"
+echo " Generating Trivy Markdown report"
+echo "================================"
 
-#docker compose --profile security run --rm -T sonar-scanner
+docker compose --profile security run --rm -T trivy-report || exit 1
+
+echo "Trivy report generated: reports/trivy/trivy-report.md"
+
+echo "================================"
+echo " Running SonarQube analysis"
+echo "================================"
+
+docker compose --profile security run --rm -T sonar-scanner
+
+echo "================================"
+echo " Adding security reports"
+echo "================================"
+
+git add reports/trivy/trivy-report.md
+
+if ! git diff --cached --quiet; then
+    git commit -m "docs(reports): update security reports"
+fi
