@@ -7,9 +7,11 @@ services:
     volumes:
       - ${STACK_PROJECT_ROOT:-../..}:/src:ro
       - ${STACK_PROJECT_ROOT:-../..}/reports/trivy:/reports
-      - trivy_cache:/root/.cache/trivy
+      - trivy_cache:/tmp/.cache/trivy
     command:
       - fs
+      - --cache-dir
+      - /tmp/.cache/trivy
       - --scanners
       - vuln,misconfig
       - --severity
