@@ -28,13 +28,3 @@ echo " Running SonarQube analysis"
 echo "================================"
 
 docker compose --profile security run --rm -T sonar-scanner
-
-echo "================================"
-echo " Adding security reports"
-echo "================================"
-
-git add reports/trivy/trivy-report.md
-
-if ! git diff --cached --quiet; then
-    git commit -m "docs(reports): update security reports"
-fi
