@@ -1,9 +1,12 @@
 services:
   trivy:
-    image: aquasec/trivy:0.76.0
+    image: aquasec/trivy:0.76.1
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     profiles:
       - security
     working_dir: /src
+    environment:
+      HOME: /tmp
     volumes:
       - ${STACK_PROJECT_ROOT:-../..}:/src:ro
       - ${STACK_PROJECT_ROOT:-../..}/reports/trivy:/reports
@@ -21,7 +24,7 @@ services:
       - /src
 
   trivy-report:
-    image: aquasec/trivy:0.76.0
+    image: aquasec/trivy:0.76.1
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     profiles:
       - security
@@ -38,6 +41,8 @@ services:
       - fs
       - --cache-dir
       - /tmp/.cache/trivy
+      - --skip-db-update
+      - --skip-check-update
       - --severity
       - HIGH,CRITICAL
       - --scanners
