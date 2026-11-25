@@ -27,4 +27,14 @@ echo "================================"
 echo " Running SonarQube analysis"
 echo "================================"
 
-docker compose --profile security run --rm -T sonar-scanner
+# Badges are refreshed even when the quality gate fails, then the scanner status is returned.
+scanner_status=0
+docker compose --profile security run --rm -T sonar-scanner || scanner_status=$?
+
+echo "================================"
+echo " Generating SonarQube badges"
+echo "================================"
+
+docker compose --profile security run --rm -T sonar-badges || echo "SonarQube badges generation failed." >&2
+
+exit "$scanner_status"

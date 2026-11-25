@@ -71,6 +71,26 @@ services:
       - ./init-quality-profile.sh:/init-quality-profile.sh:ro
     entrypoint: ["/bin/sh", "/init-quality-profile.sh"]
 
+  sonar-badges:
+    image: curlimages/curl:latest
+    profiles: [security]
+    user: "0:0"
+    depends_on:
+      sonarqube:
+        condition: service_healthy
+    environment:
+      SONAR_URL: ${SONAR_URL:-http://sonarqube:9000}
+      SONAR_USER: ${SONAR_USER:-admin}
+      SONAR_PASSWORD: ${SONAR_PASSWORD:-admin}
+      SONAR_PROJECT_KEY: ${SONAR_PROJECT_KEY:-}
+      SONAR_BADGES_DIR: ${SONAR_BADGES_DIR:-reports/sonarqube/badges}
+      SONAR_BADGE_METRICS: ${SONAR_BADGE_METRICS:-}
+      PROJECT_DIR: /usr/src
+    volumes:
+      - ${SONAR_PROJECT_DIR:-${STACK_PROJECT_ROOT:-../..}}:/usr/src
+      - ./generate-badges.sh:/generate-badges.sh:ro
+    entrypoint: ["/bin/sh", "/generate-badges.sh"]
+
 volumes:
   sonarqube_data:
   sonarqube_extensions:
